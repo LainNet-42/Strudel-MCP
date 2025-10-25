@@ -1,15 +1,20 @@
 import { chromium, Browser, Page } from 'playwright';
 import { AudioAnalyzer } from './AudioAnalyzer.js';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class StrudelController {
   private browser: Browser | null = null;
   private page: Page | null = null;
   private analyzer: AudioAnalyzer;
   private isHeadless: boolean;
+  private watcher: fs.FSWatcher | null = null;
+  private patternFilePath: string;
 
   constructor(headless: boolean = false) {
     this.isHeadless = headless;
     this.analyzer = new AudioAnalyzer();
+    this.patternFilePath = path.join(process.cwd(), 'patterns', 'current.tidal');
   }
 
   async initialize(): Promise<string> {
@@ -36,7 +41,36 @@ export class StrudelController {
 
     await this.analyzer.inject(this.page);
 
+    this.startFileWatcher();
+
     return 'Strudel initialized successfully';
+  }
+
+  private startFileWatcher(): void {
+    const patternsDir = path.dirname(this.patternFilePath);
+
+    if (!fs.existsSync(patternsDir)) {
+      fs.mkdirSync(patternsDir, { recursive: true });
+    }
+
+    if (!fs.existsSync(this.patternFilePath)) {
+      fs.writeFileSync(this.patternFilePath, '');
+    }
+
+    this.watcher = fs.watch(this.patternFilePath, async (eventType) => {
+      if (eventType === 'change') {
+        try {
+          const content = fs.readFileSync(this.patternFilePath, 'utf8');
+          if (content.trim()) {
+            await this.writePattern(content);
+          }
+        } catch (error) {
+          console.error('File watch error:', error);
+        }
+      }
+    });
+
+    console.log(`Watching pattern file: ${this.patternFilePath}`);
   }
 
   async writePattern(pattern: string): Promise<string> {
@@ -91,6 +125,10 @@ export class StrudelController {
   }
 
   async cleanup() {
+    if (this.watcher) {
+      this.watcher.close();
+      this.watcher = null;
+    }
     if (this.browser) {
       await this.browser.close();
       this.browser = null;

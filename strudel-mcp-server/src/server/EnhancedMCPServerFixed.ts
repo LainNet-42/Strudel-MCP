@@ -52,68 +52,16 @@ export class EnhancedMCPServerFixed {
   }
 
   private getTools(): Tool[] {
-    // Same tools as before - keeping the same structure
     return [
-      // Core Control Tools (10)
+      // Core Control Tools (4)
       {
         name: 'init',
         description: 'Initialize Strudel in browser',
         inputSchema: { type: 'object', properties: {} }
       },
       {
-        name: 'write',
-        description: 'Write pattern to editor',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            pattern: { type: 'string', description: 'Pattern code' }
-          },
-          required: ['pattern']
-        }
-      },
-      {
-        name: 'append',
-        description: 'Append code to current pattern',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            code: { type: 'string', description: 'Code to append' }
-          },
-          required: ['code']
-        }
-      },
-      {
-        name: 'insert',
-        description: 'Insert code at specific line',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            position: { type: 'number', description: 'Line number' },
-            code: { type: 'string', description: 'Code to insert' }
-          },
-          required: ['position', 'code']
-        }
-      },
-      {
-        name: 'replace',
-        description: 'Replace pattern section',
-        inputSchema: {
-          type: 'object',
-          properties: {
-            search: { type: 'string', description: 'Text to replace' },
-            replace: { type: 'string', description: 'Replacement text' }
-          },
-          required: ['search', 'replace']
-        }
-      },
-      {
         name: 'play',
         description: 'Start playing pattern',
-        inputSchema: { type: 'object', properties: {} }
-      },
-      {
-        name: 'pause',
-        description: 'Pause playback',
         inputSchema: { type: 'object', properties: {} }
       },
       {
@@ -124,11 +72,6 @@ export class EnhancedMCPServerFixed {
       {
         name: 'clear',
         description: 'Clear the editor',
-        inputSchema: { type: 'object', properties: {} }
-      },
-      {
-        name: 'get_pattern',
-        description: 'Get current pattern code',
         inputSchema: { type: 'object', properties: {} }
       },
 
@@ -550,36 +493,15 @@ export class EnhancedMCPServerFixed {
           }
         }
         return initResult;
-      
-      case 'write':
-        return await this.writePatternSafe(args.pattern);
-      
-      case 'append':
-        const current = await this.getCurrentPatternSafe();
-        return await this.writePatternSafe(current + '\n' + args.code);
-      
-      case 'insert':
-        const lines = (await this.getCurrentPatternSafe()).split('\n');
-        lines.splice(args.position, 0, args.code);
-        return await this.writePatternSafe(lines.join('\n'));
-      
-      case 'replace':
-        const pattern = await this.getCurrentPatternSafe();
-        const replaced = pattern.replace(args.search, args.replace);
-        return await this.writePatternSafe(replaced);
-      
+
       case 'play':
         return await this.controller.play();
-      
-      case 'pause':
+
       case 'stop':
         return await this.controller.stop();
-      
+
       case 'clear':
         return await this.writePatternSafe('');
-      
-      case 'get_pattern':
-        return await this.getCurrentPatternSafe();
       
       // Pattern Generation - These can work without browser
       case 'generate_pattern':

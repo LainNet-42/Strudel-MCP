@@ -48,5 +48,11 @@
 **总计**: 40个工具，涵盖基础控制、变换、生成、分析、效果、存储、历史和音乐理论8个类别
 
 ## 优化记录
-[] tools - 只保留必要的基础工具
-[] hooks - CC session start 自动init
+[✓] 把strudel的文件读写tool转移到了本地，让本地的cc 原生工具就可以操作
+[ ] 目前是单向通信，只有写文件可以把内容放过去，双向可以做，但优先级不高
+
+### Session 0: Hooks配置
+
+[✓] hooks - CC session start 自动init
+- 配置文件: `.claude/settings.json`
+- SessionStart hook自动提示Claude调用init
