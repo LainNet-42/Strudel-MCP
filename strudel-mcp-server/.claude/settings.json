@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '[STRUDEL] 必须先执行init工具初始化浏览器环境'"
+          }
+        ]
+      }
+    ]
+  }
+}

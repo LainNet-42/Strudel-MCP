@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'CRITICAL: Strudel MCP Server project loaded. You MUST immediately call mcp__strudel__init tool to initialize browser environment. This is a prerequisite for using any Strudel functionality. After initialization completes, tell user: Strudel enabled.'"
+          }
+        ]
+      }
+    ]
+  }
+}

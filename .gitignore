@@ -1,0 +1,47 @@
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# Pattern storage
+patterns/*.json
+
+# Local Claude config
+.claude/settings.local.json
+
+# Claude AI development tools
+.claude-flow/
+.hive-mind/
+.swarm/
