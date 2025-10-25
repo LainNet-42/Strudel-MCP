@@ -1,0 +1,54 @@
+stack(
+  s("808bd(3,8)").gain(1.0).lpf(80),
+
+  s("808sd(5,16,2)").gain(0.5)
+    .delay(0.15)
+    .delaytime(0.125)
+    .delayfeedback(0.25),
+
+  s("808ch(11,16)").gain(0.2)
+    .pan(sine.slow(8))
+    .hpf(10000),
+
+  s("808oh(7,16,4)").gain(0.25)
+    .speed(1.05)
+    .pan(saw.slow(6)),
+
+  note("<a1 a1 g1 f1>")
+    .s("sawtooth")
+    .cutoff(sine.range(300, 600).slow(8))
+    .resonance(10)
+    .gain(0.75)
+    .lpf(400)
+    .room(0.2),
+
+  note("<[a3 c4 e4] [g3 bb3 d4] [f3 a3 c4] [e3 g3 b3]>")
+    .s("sine")
+    .gain(sine.range(0.2, 0.35).slow(16))
+    .room(0.9)
+    .size(0.85)
+    .delay(0.4)
+    .delaytime(0.375)
+    .delayfeedback(0.6)
+    .lpf(3000),
+
+  note("~ a4 ~ c5 ~ e5 ~ ~")
+    .s("triangle")
+    .cutoff(sine.range(1500, 2000).slow(8))
+    .gain(0.3)
+    .delay(0.3)
+    .delaytime(0.1875)
+    .delayfeedback(0.5),
+
+  s("~ ~ ~ [rim rim]").bank("RolandTR909")
+    .gain(0.25)
+    .delay(0.3)
+    .delaytime(0.25),
+
+  note("~ ~ ~ <a2 f2>")
+    .s("square")
+    .cutoff(250)
+    .gain(0.6)
+    .lpf(150)
+    .room(0.4)
+)._scope()._spectrum().cpm(126/4)

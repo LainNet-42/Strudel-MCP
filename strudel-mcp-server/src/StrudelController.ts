@@ -48,37 +48,81 @@ export class StrudelController {
 
   private startFileWatcher(): void {
     const patternsDir = path.dirname(this.patternFilePath);
+    const logFile = path.join(process.cwd(), 'strudel-debug.log');
+
+    const log = (msg: string) => {
+      const timestamp = new Date().toISOString();
+      const logMsg = `[${timestamp}] ${msg}\n`;
+      try {
+        fs.appendFileSync(logFile, logMsg);
+      } catch (e) {
+        console.error('Failed to write log:', e);
+      }
+      console.log(msg);
+    };
+
+    log(`[DEBUG] Starting file watcher...`);
+    log(`[DEBUG] Current working directory: ${process.cwd()}`);
+    log(`[DEBUG] Pattern file path: ${this.patternFilePath}`);
+    log(`[DEBUG] Patterns directory: ${patternsDir}`);
 
     if (!fs.existsSync(patternsDir)) {
+      log(`[DEBUG] Creating patterns directory...`);
       fs.mkdirSync(patternsDir, { recursive: true });
     }
 
     if (!fs.existsSync(this.patternFilePath)) {
+      log(`[DEBUG] Creating empty pattern file...`);
       fs.writeFileSync(this.patternFilePath, '');
     }
 
     this.watcher = fs.watch(this.patternFilePath, async (eventType) => {
-      if (eventType === 'change') {
+      log(`[DEBUG] File event detected: ${eventType}`);
+      if (eventType === 'change' || eventType === 'rename') {
         try {
+          if (!fs.existsSync(this.patternFilePath)) {
+            log('[DEBUG] File does not exist yet, waiting...');
+            return;
+          }
           const content = fs.readFileSync(this.patternFilePath, 'utf8');
+          log(`[DEBUG] File content read (${content.length} chars): ${content.substring(0, 50)}...`);
           if (content.trim()) {
+            log(`[DEBUG] Writing pattern to browser...`);
             await this.writePattern(content);
+            log(`[DEBUG] Pattern written successfully`);
           }
         } catch (error) {
-          console.error('File watch error:', error);
+          log('[ERROR] File watch error: ' + error);
+          console.error('[ERROR] File watch error:', error);
         }
       }
     });
 
-    console.log(`Watching pattern file: ${this.patternFilePath}`);
+    log(`[SUCCESS] Watching pattern file: ${this.patternFilePath}`);
   }
 
   async writePattern(pattern: string): Promise<string> {
     if (!this.page) throw new Error('Not initialized');
 
-    await this.page.click('.cm-content');
-    await this.page.keyboard.press('ControlOrMeta+A');
-    await this.page.keyboard.type(pattern);
+    await this.page.evaluate((code) => {
+      const editorElement = document.querySelector('.cm-content');
+      if (!editorElement) {
+        throw new Error('Editor not found');
+      }
+
+      const view = (editorElement as any).cmView?.view;
+      if (view) {
+        view.dispatch({
+          changes: {
+            from: 0,
+            to: view.state.doc.length,
+            insert: code
+          }
+        });
+      } else {
+        throw new Error('CodeMirror view not found');
+      }
+    }, pattern);
 
     return `Pattern written (${pattern.length} chars)`;
   }
@@ -90,6 +134,19 @@ export class StrudelController {
       const editor = document.querySelector('.cm-content');
       return editor?.textContent || '';
     });
+  }
+
+  getDebugInfo(): any {
+    return {
+      initialized: !!this.browser,
+      watching: !!this.watcher,
+      cwd: process.cwd(),
+      patternFilePath: this.patternFilePath,
+      fileExists: fs.existsSync(this.patternFilePath),
+      fileContent: fs.existsSync(this.patternFilePath)
+        ? fs.readFileSync(this.patternFilePath, 'utf8').substring(0, 100)
+        : 'N/A'
+    };
   }
 
   async play(): Promise<string> {
