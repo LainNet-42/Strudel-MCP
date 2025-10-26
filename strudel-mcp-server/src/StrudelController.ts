@@ -10,6 +10,8 @@ export class StrudelController {
   private isHeadless: boolean;
   private watcher: fs.FSWatcher | null = null;
   private patternFilePath: string;
+  private lastError: string | null = null;
+  private lastErrorTime: number = 0;
 
   constructor(headless: boolean = false) {
     this.isHeadless = headless;
@@ -32,6 +34,15 @@ export class StrudelController {
     });
 
     this.page = await context.newPage();
+
+    // Monitor console for errors
+    this.page.on('console', (msg) => {
+      const text = msg.text();
+      if (text.includes('error:') || text.includes('Error:') || text.includes('SyntaxError')) {
+        this.lastError = text;
+        this.lastErrorTime = Date.now();
+      }
+    });
 
     await this.page.goto('https://strudel.cc/', {
       waitUntil: 'networkidle',
@@ -152,6 +163,20 @@ export class StrudelController {
   async play(): Promise<string> {
     if (!this.page) throw new Error('Not initialized');
 
+    const logFile = path.join(process.cwd(), 'strudel-debug.log');
+    const log = (msg: string) => {
+      const timestamp = new Date().toISOString();
+      const logMsg = `[${timestamp}] ${msg}\n`;
+      try {
+        fs.appendFileSync(logFile, logMsg);
+      } catch (e) {
+        console.error('Failed to write log:', e);
+      }
+    };
+
+    const startTime = Date.now();
+    this.lastError = null;
+
     try {
       await this.page.click('button[title*="play" i]', { timeout: 1000 });
     } catch {
@@ -159,6 +184,15 @@ export class StrudelController {
     }
 
     await this.page.waitForTimeout(500);
+
+    // Wait for evaluation and check for errors
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (this.lastError && this.lastErrorTime > startTime) {
+      log(`[PLAY_FAILED] ${this.lastError}`);
+    } else {
+      log(`[PLAY_SUCCESS] Playing successfully`);
+    }
 
     return 'Playing';
   }

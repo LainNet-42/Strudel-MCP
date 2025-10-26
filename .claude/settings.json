@@ -5,7 +5,27 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'CRITICAL: Strudel MCP Server project loaded. You MUST immediately call mcp__strudel__init tool to initialize browser environment. This is a prerequisite for using any Strudel functionality. After initialization completes, tell user: Strudel enabled.'"
+            "command": "echo 'CRITICAL: Strudel MCP Server project loaded. You MUST immediately call mcp__strudel__init tool to initialize browser environment. This is a prerequisite for using any Strudel functionality. After initialization completes, tell user: Strudel enabled.\n\nYOU MUST USE Pattern file: C:\\Users\\Administrator\\dj\\patterns\\current.tidal - All pattern edits here sync automatically to Strudel browser.'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If you modified the pattern file (current.tidal), you should immediately call mcp__strudel__play tool\"}}'"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__strudel__play",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude\\hooks\\check-play-result.py"
           }
         ]
       }

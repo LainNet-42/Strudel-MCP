@@ -45,3 +45,6 @@ patterns/*.json
 .claude-flow/
 .hive-mind/
 .swarm/
+
+# CLAUDE
+CLAUDE.md
