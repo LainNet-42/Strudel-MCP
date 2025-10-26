@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"If you modified the pattern file (current.tidal), you should immediately call mcp__strudel__play tool\"}}'"
+            "command": "python .claude\\hooks\\notify-play.py"
           }
         ]
       },
