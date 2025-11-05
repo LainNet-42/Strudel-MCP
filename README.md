@@ -63,6 +63,10 @@ claude mcp add strudel node /path/to/Strudel-MCP/strudel-mcp-server/dist/index.j
 claude hi, make a dreamlike beat
 ```
 
+```bash
+claude create an H&M like store vibe house music with vocal samples using samples('github:algorave-dave/samples') and samples('github:tidalcycles/dirt-samples'), use fetch tool to see the sample names first
+```
+
 That's it - Claude will initialize Strudel, generate a pattern, and start playing music automatically.
 
 ---
