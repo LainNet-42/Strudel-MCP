@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**AI-Powered Live Coding Music Creation**
+**AI Live Coding Music Creation**
 
 Control [Strudel.cc](https://strudel.cc/) directly from Claude Code for seamless AI-assisted music generation.
 

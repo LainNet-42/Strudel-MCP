@@ -1,15 +1,38 @@
-// 两只老虎 - 合成器版
-setDefaultVoicings('legacy')
-
-const chrds = "C@4 C@2 G@2 C@4 C@2 G@2 C@2".slow(8);
+// 土嗨House - 极致土味
+samples('github:tidalcycles/dirt-samples')
+samples('github:algorave-dave/samples')
 
 stack(
-"C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4@2 E4 F4 G4@2 [G4 A4 G4 F4] E4 C4 [G4 A4 G4 F4] E4 C4 C4 G3 C4@2 C4 G3 C4@2".slow(8).note().s("sawtooth").cutoff(1500).gain(0.5).attack(0.01).decay(0.15).sustain(0.4).release(0.1).color('green'),
+  // 土味旋律 - 就三个音反复
+  note("c4 c4 eb4 c4 g4 g4 eb4 c4").fast(2)
+    .s("square")
+    .cutoff(800)
+    .gain(0.6)
+    .color('red'),
 
-chord(chrds).anchor("G4").struct("x*2").voicing().s("triangle").lpf(800).gain(0.3).color('yellow'),
+  // 超简单贝斯 - 就蹦蹦蹦
+  note("c2!4 f2!4").fast(2)
+    .s("sawtooth")
+    .lpf(150)
+    .gain(0.8)
+    .color('orange'),
 
-n("0 ~ 4 ~").chord(chrds).anchor(chrds.rootNotes(2)).voicing().s("triangle").lpf(300).gain(0.7).color('blue'),
+  // 四四拍死板节奏
+  s("bd*4").bank("RolandTR909").gain(1),
+  s("~ cp ~ cp").bank("RolandTR909").gain(0.7),
+  s("hh*8").bank("RolandTR909").gain(0.4),
 
-s("bd ~ ~ ~, ~ ~ hh ~").bank("RolandTR808").gain(0.3)
+  // 土味采样大杂烩
+  s("~ ~ casio:0 ~").gain(0.7),
+  s("~ ~ ~ ~ ~ wind:2 ~ ~").slow(2).gain(0.5),
+  s("~ ~ ~ jazz:0").gain(0.6),
+  s("metal:1 ~ ~ ~").slow(2).gain(0.5),
 
-).cpm(100/4).room(0.3)
+  // 土味和弦 - 方波三和音
+  note("<[c3,e3,g3] [eb3,g3,bb3] [g3,b3,d4] [f3,a3,c4]>")
+    .s("square")
+    .lpf(600)
+    .gain(0.3)
+    .color('yellow')
+
+).cpm(130/4).room(0.5)
