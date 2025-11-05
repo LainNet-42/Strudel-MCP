@@ -17,6 +17,8 @@ Control [Strudel.cc](https://strudel.cc/) directly from Claude Code for seamless
 
 Strudel MCP Server is a [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server that enables Claude Code to control Strudel.cc in real-time. Create algorithmic music patterns, live code beats, and explore generative composition with AI.
 
+![Strudel MCP in Action](cover/cover.png)
+
 ---
 
 ## Installation
@@ -54,6 +56,14 @@ npm run build
 # Add the MCP server to Claude
 claude mcp add strudel node /path/to/Strudel-MCP/strudel-mcp-server/dist/index.js
 ```
+
+### 2. Start Creating
+
+```bash
+claude hi, make a dreamlike beat
+```
+
+That's it - Claude will initialize Strudel, generate a pattern, and start playing music automatically.
 
 ---
 
