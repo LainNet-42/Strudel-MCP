@@ -48,3 +48,9 @@ patterns/*.json
 
 # CLAUDE
 CLAUDE.md
+
+# Development/Testing directory
+dev/
+
+# Debug logs
+strudel-debug.log

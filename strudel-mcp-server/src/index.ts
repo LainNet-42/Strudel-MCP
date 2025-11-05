@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { EnhancedMCPServerFixed } from './server/EnhancedMCPServerFixed.js';
+import { EnhancedMCPServerSimple } from './server/EnhancedMCPServerSimple.js';
 
-const server = new EnhancedMCPServerFixed();
+const server = new EnhancedMCPServerSimple();
 server.run().catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);

@@ -48,7 +48,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/williamzujkowski/strudel-mcp-server.git"
+    "url": "git+https://github.com/LainNet-42/Strudel-MCP.git"
   },
   "keywords": [
     "mcp",
@@ -66,9 +66,9 @@
   "author": "William Zujkowski <william.zujkowski@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/williamzujkowski/strudel-mcp-server/issues"
+    "url": "https://github.com/LainNet-42/Strudel-MCP/issues"
   },
-  "homepage": "https://github.com/williamzujkowski/strudel-mcp-server#readme",
+  "homepage": "https://github.com/LainNet-42/Strudel-MCP#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"

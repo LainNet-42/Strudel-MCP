@@ -177,10 +177,17 @@ export class StrudelController {
     const startTime = Date.now();
     this.lastError = null;
 
+    // Try update first (works when already playing), fallback to play
     try {
-      await this.page.click('button[title*="play" i]', { timeout: 1000 });
+      await this.page.click('button[title="update"]', { timeout: 1000 });
     } catch {
-      await this.page.keyboard.press('ControlOrMeta+Enter');
+      // Fallback to play button
+      try {
+        await this.page.click('button[title="play"]', { timeout: 1000 });
+      } catch {
+        // Final fallback to keyboard shortcut
+        await this.page.keyboard.press('ControlOrMeta+Enter');
+      }
     }
 
     await this.page.waitForTimeout(500);
