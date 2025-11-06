@@ -2,6 +2,7 @@ import { chromium, Browser, Page } from 'playwright';
 import { AudioAnalyzer } from './AudioAnalyzer.js';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 export class StrudelController {
   private browser: Browser | null = null;
@@ -12,11 +13,26 @@ export class StrudelController {
   private patternFilePath: string;
   private lastError: string | null = null;
   private lastErrorTime: number = 0;
+  // Mac compatibility: polling backup mechanism
+  private pollingInterval: NodeJS.Timeout | null = null;
+  private lastFileSize: number = 0;
+  private lastFileTime: number = 0;
 
   constructor(headless: boolean = false) {
     this.isHeadless = headless;
     this.analyzer = new AudioAnalyzer();
     this.patternFilePath = path.join(process.cwd(), 'patterns', 'current.tidal');
+  }
+
+  private log(msg: string) {
+    const logFile = path.join(process.cwd(), 'strudel-debug.log');
+    const timestamp = new Date().toISOString();
+    const logMsg = `[${timestamp}] ${msg}\n`;
+    try {
+      fs.appendFileSync(logFile, logMsg);
+    } catch (e) {
+      // Ignore log errors to avoid infinite recursion
+    }
   }
 
   async initialize(): Promise<string> {
@@ -110,6 +126,9 @@ export class StrudelController {
     });
 
     log(`[SUCCESS] Watching pattern file: ${this.patternFilePath}`);
+
+    // Start polling backup mechanism for Mac compatibility
+    this.startPollingBackup();
   }
 
   async writePattern(pattern: string): Promise<string> {
@@ -222,10 +241,66 @@ export class StrudelController {
     return await this.analyzer.getAnalysis(this.page);
   }
 
+  // Mac compatibility: start polling backup mechanism
+  private startPollingBackup() {
+    // Only enable on macOS as a backup mechanism
+    if (os.platform() !== 'darwin') {
+      return;
+    }
+
+    this.log('[DEBUG] Starting polling backup mechanism for Mac compatibility...');
+
+    // Poll every 2 seconds
+    this.pollingInterval = setInterval(async () => {
+      try {
+        if (!fs.existsSync(this.patternFilePath)) {
+          return;
+        }
+
+        const stats = fs.statSync(this.patternFilePath);
+        const currentSize = stats.size;
+        const currentTime = stats.mtime.getTime();
+
+        // Check if file has been modified
+        if ((currentSize !== this.lastFileSize) || (currentTime !== this.lastFileTime)) {
+          this.log(`[DEBUG] Polling detected file change: size ${this.lastFileSize}->${currentSize}, time ${this.lastFileTime}->${currentTime}`);
+
+          const content = fs.readFileSync(this.patternFilePath, 'utf8');
+          if (content.trim()) {
+            this.log(`[DEBUG] Polling: Writing pattern to browser...`);
+            await this.writePattern(content);
+            this.log(`[DEBUG] Polling: Pattern written successfully`);
+          }
+
+          this.lastFileSize = currentSize;
+          this.lastFileTime = currentTime;
+        }
+      } catch (error) {
+        this.log(`[ERROR] Polling backup error: ${error}`);
+      }
+    }, 2000);
+
+    // Initialize file stats
+    try {
+      if (fs.existsSync(this.patternFilePath)) {
+        const stats = fs.statSync(this.patternFilePath);
+        this.lastFileSize = stats.size;
+        this.lastFileTime = stats.mtime.getTime();
+      }
+    } catch (error) {
+      this.log(`[ERROR] Failed to initialize file stats: ${error}`);
+    }
+  }
+
   async cleanup() {
     if (this.watcher) {
       this.watcher.close();
       this.watcher = null;
+    }
+
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+      this.pollingInterval = null;
     }
     if (this.browser) {
       await this.browser.close();

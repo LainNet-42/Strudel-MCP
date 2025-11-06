@@ -47,7 +47,7 @@ patterns/*.json
 .swarm/
 
 # CLAUDE
-CLAUDE.md
+#CLAUDE.md
 
 # Development/Testing directory
 dev/
